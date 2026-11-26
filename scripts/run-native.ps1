@@ -12,17 +12,46 @@
 $ErrorActionPreference = "Stop"
 Set-Location (Split-Path $PSScriptRoot -Parent)
 
+# Windows PowerShell 5.1 defaults to old TLS; dl.min.io needs TLS 1.2+.
+[Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
+
+Write-Host "[*] Running in: $(Get-Location)"
+
+function Get-RemoteFile([string]$Url, [string]$OutFile) {
+    $tmpFile = "$OutFile.part"
+    $ok = $false
+    if (Get-Command curl.exe -ErrorAction SilentlyContinue) {
+        & curl.exe -fsSL --retry 2 -o $tmpFile $Url
+        $ok = ($LASTEXITCODE -eq 0) -and (Test-Path $tmpFile) -and ((Get-Item $tmpFile).Length -gt 10MB)
+    }
+    if (-not $ok) {
+        Write-Host "    curl.exe unavailable or failed; trying Invoke-WebRequest..."
+        try {
+            Invoke-WebRequest -Uri $Url -OutFile $tmpFile -UseBasicParsing
+            $ok = (Test-Path $tmpFile) -and ((Get-Item $tmpFile).Length -gt 10MB)
+        } catch {
+            Write-Host "    Invoke-WebRequest also failed: $($_.Exception.Message)"
+        }
+    }
+    if ($ok) {
+        Move-Item -Force $tmpFile $OutFile
+        Write-Host "    saved $OutFile ($([math]::Round((Get-Item $OutFile).Length / 1MB)) MB)"
+    } else {
+        Write-Error "Could not download $Url. Check your internet connection / antivirus / proxy and run the script again."
+    }
+}
+
 if (-not (Get-Command python -ErrorAction SilentlyContinue)) {
     Write-Error "python was not found on PATH. Install Python 3.10+ from https://www.python.org/downloads/ (tick 'Add to PATH') and re-run."
 }
 
 $targets = "bin\minio.exe", "bin\mc.exe"
-$missing = @($targets | Where-Object { -not (Test-Path $_) })
+$missing = @($targets | Where-Object { -not ((Test-Path $_) -and ((Get-Item $_).Length -gt 10MB)) })
 if ($missing.Count -gt 0) {
     Write-Host "[*] Downloading MinIO binaries (first run only)..."
     New-Item -ItemType Directory -Force -Path bin | Out-Null
-    Invoke-WebRequest -Uri "https://dl.min.io/server/minio/release/windows-amd64/minio.exe" -OutFile "bin\minio.exe"
-    Invoke-WebRequest -Uri "https://dl.min.io/client/mc/release/windows-amd64/mc.exe" -OutFile "bin\mc.exe"
+    Get-RemoteFile "https://dl.min.io/server/minio/release/windows-amd64/minio.exe" "bin\minio.exe"
+    Get-RemoteFile "https://dl.min.io/client/mc/release/windows-amd64/mc.exe" "bin\mc.exe"
 }
 
 $hostsPath = "$env:SystemRoot\System32\drivers\etc\hosts"
@@ -50,6 +79,7 @@ foreach ($i in 1..60) {
         if ($r.StatusCode -eq 200) { $up = $true; break }
     } catch { Start-Sleep -Seconds 2 }
 }
+
 if (-not $up) { Write-Error "MinIO did not become healthy. Check 'bin\mc.exe admin info local' after 'bin\mc.exe alias set local http://127.0.0.1:9000 labadmin labdev-only-change-me'." }
 
 Write-Host "[*] Preparing public bucket and demo objects..."
