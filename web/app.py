@@ -44,88 +44,125 @@ STYLE = """
 <style>
  :root { color-scheme: dark; }
  * { box-sizing: border-box; }
- body {
-  font-family: -apple-system, "Segoe UI", Roboto, Inter, sans-serif;
-  background: #0b0e14;
-  background-image:
-   radial-gradient(640px 320px at 12% -8%, rgba(56,132,255,.16), transparent 60%),
-   radial-gradient(520px 280px at 108% 6%, rgba(139,92,246,.13), transparent 60%);
-  background-repeat: no-repeat;
-  min-height: 100vh; margin: 0; color: #e6e9ef;
- }
- .card { max-width: 560px; margin: 48px auto; background: rgba(21,26,35,.92);
-         border: 1px solid #232a38; border-radius: 18px;
-         padding: 30px 34px; box-shadow: 0 18px 40px rgba(0,0,0,.45); }
- h1 { margin: 0 0 8px; font-size: 1.4rem; letter-spacing: .2px;
-      background: linear-gradient(90deg, #4d9fff, #a78bfa);
-      -webkit-background-clip: text; background-clip: text; color: transparent; }
- code { background: #1b2230; padding: 2px 7px; border-radius: 6px;
-        color: #9ecbff; font-size: .9em; }
+ body { margin: 0; background: #18191a; color: #e4e6eb;
+        font-family: Helvetica, Arial, "Segoe UI", Roboto, sans-serif; }
+ .topbar { position: sticky; top: 0; z-index: 10; display: flex; align-items: center;
+           gap: 14px; background: #242526; border-bottom: 1px solid #3a3b3c;
+           padding: 8px 16px; height: 56px; box-shadow: 0 1px 2px rgba(0,0,0,.3); }
+ .logo { font-size: 1.6rem; font-weight: 800; letter-spacing: -1px;
+         color: #2d88ff; user-select: none; }
+ .logo b { color: #a78bfa; }
+ .search { flex: 0 1 260px; background: #3a3b3c; border-radius: 999px;
+           padding: 8px 16px; color: #b0b3b8; font-size: .9rem; }
+ .fill { flex: 1; }
+ .mechip { display: flex; align-items: center; gap: 8px; background: #3a3b3c;
+           border-radius: 999px; padding: 4px 12px 4px 4px; font-size: .9rem;
+           font-weight: 600; }
+ .initial { width: 28px; height: 28px; border-radius: 50%; color: #fff; font-size: .85rem;
+            display: flex; align-items: center; justify-content: center;
+            background: linear-gradient(135deg, #2d88ff, #a78bfa); }
+ .wrap { max-width: 640px; margin: 16px auto 48px; padding: 0 10px; }
+ .card { background: #242526; border: 1px solid #3a3b3c; border-radius: 8px;
+         padding: 16px; margin-bottom: 12px; box-shadow: 0 1px 2px rgba(0,0,0,.2); }
+ h1 { font-size: 1.25rem; margin: 0; }
+ h2 { font-size: 1rem; margin: 0 0 12px; color: #b0b3b8; font-weight: 500; }
+ code { background: #3a3b3c; padding: 2px 6px; border-radius: 4px;
+        color: #9bc1f9; font-size: .9em; }
+ .cover { height: 150px; border-radius: 8px 8px 0 0;
+          background: linear-gradient(120deg, #16243d, #231a42 55%, #101017);
+          margin: -16px -16px 0; }
+ .head { display: flex; align-items: flex-end; gap: 14px; margin: -60px 8px 0; }
  img.avatar { width: 128px; height: 128px; object-fit: cover; border-radius: 50%;
-              border: 3px solid #263042; box-shadow: 0 0 0 4px rgba(77,159,255,.18);
-              background: #10151d; }
- input, button { font-size: 1rem; padding: 10px 14px; margin: 8px 0;
-                 border-radius: 10px; display: block; width: 100%; }
- input { background: #10151d; border: 1px solid #2a3446; color: #e6e9ef; }
- input:focus { outline: none; border-color: #4d9fff;
-               box-shadow: 0 0 0 3px rgba(77,159,255,.18); }
- button { background: linear-gradient(90deg, #1877f2, #6d5df6); color: #fff;
-          border: 0; cursor: pointer; font-weight: 600;
-          transition: filter .15s ease, transform .05s ease; }
- button:hover { filter: brightness(1.12); }
- button:active { transform: scale(.99); }
- .err { color: #ff7b72; font-weight: 600; }
- .ok { color: #4ade80; font-weight: 600; }
- .muted { color: #8a93a6; font-size: .9rem; }
- a { color: #6ea8ff; }
- hr { border: 0; border-top: 1px solid #232a38; margin: 18px 0; }
+              border: 3px solid #242526; background: #3a3b3c; flex-shrink: 0; }
+ .who { padding-bottom: 6px; }
+ .who .muted { margin: 2px 0 0; }
+ input, button { font-size: 15px; padding: 11px 14px; margin: 6px 0;
+                 border-radius: 6px; display: block; width: 100%; }
+ input { background: #3a3b3c; border: 1px solid transparent; color: #e4e6eb; }
+ input:focus { outline: none; border-color: #2d88ff; }
+ button { background: #2d88ff; color: #fff; border: 0; cursor: pointer;
+          font-weight: 700; transition: background .15s ease; }
+ button:hover { background: #1a6fe8; }
+ .err { color: #f0284a; font-weight: 600; }
+ .ok { color: #45bd62; font-weight: 600; }
+ .muted { color: #b0b3b8; font-size: .95rem; }
+ a { color: #4599ff; text-decoration: none; }
+ a:hover { text-decoration: underline; }
+ .div { border-top: 1px solid #3a3b3c; margin: 14px -16px; }
+ .links { display: flex; gap: 16px; align-items: center; }
 </style>
 """
 
-LOGIN_PAGE = STYLE + """
-<div class="card">
- <h1>◈ TargetSocial</h1>
- <p class="muted" style="margin-top:0">A tiny demo social network: users upload avatar images.</p>
+TOPBAR = """
+<div class="topbar">
+ <span class="logo">target<b>social</b></span>
+ <div class="search">Search TargetSocial</div>
+ <div class="fill"></div>
+ {% if username %}<span class="mechip"><span class="initial">{{ username[0]|upper }}</span>{{ username }}</span>{% endif %}
+</div>
+<div class="wrap">
+"""
+
+LOGIN_PAGE = STYLE + TOPBAR + """
+<div class="card" style="max-width:400px;margin:64px auto">
+ <h1>Log in to TargetSocial</h1>
+ <p class="muted" style="margin-top:4px">A tiny demo social network: users upload avatar images.</p>
  {% if error %}<p class="err">{{ error }}</p>{% endif %}
  <form method="post" action="/login">
   <input name="username" placeholder="username" value="alice" required>
   <input name="password" type="password" placeholder="password" value="alice-pass-123" required>
   <button>Log in</button>
  </form>
+ <div class="div"></div>
  <p class="muted">Demo users: <code>alice / alice-pass-123</code>,
  <code>bob / bob-pass-123</code></p>
 </div>
 """
 
-PROFILE_PAGE = STYLE + """
+PROFILE_PAGE = STYLE + TOPBAR + """
 <div class="card">
- <h1>{{ username }}</h1>
- <img class="avatar" src="/uploads/{{ avatar }}?v={{ nonce }}" alt="avatar of {{ username }}">
- <p>{{ username }}'s profile page on TargetSocial.</p>
- {% if is_me %}
-  <p class="ok">You are logged in. Private note (only you should see this):</p>
-  <p><code>{{ note }}</code></p>
-  <p><a href="/upload">Upload a new avatar</a> &middot;
-     <a href="/u/{{ username }}">Public view</a></p>
-  <form method="post" action="/logout"><button>Log out</button></form>
-  <p class="muted">Your avatar is served at
-     <code>/uploads/{{ avatar }}</code> from this same origin.</p>
- {% else %}
-  <p class="muted">You are viewing {{ username }}'s public profile.</p>
-  <p><a href="/login">Log in</a></p>
- {% endif %}
+ <div class="cover"></div>
+ <div class="head">
+  <img class="avatar" src="/uploads/{{ avatar }}?v={{ nonce }}" alt="avatar of {{ username }}">
+  <div class="who">
+   <h1>{{ username }}</h1>
+   <p class="muted">{{ username }}'s profile page on TargetSocial</p>
+  </div>
+ </div>
 </div>
+{% if is_me %}
+<div class="card">
+ <h2>You are logged in — private note (only you should see this)</h2>
+ <p><code>{{ note }}</code></p>
+</div>
+<div class="card">
+ <div class="links">
+  <a href="/upload">Upload a new avatar</a>
+  <a href="/u/{{ username }}">Public view</a>
+ </div>
+ <form method="post" action="/logout"><button>Log out</button></form>
+ <p class="muted">Your avatar is served at
+    <code>/uploads/{{ avatar }}</code> from this same origin.</p>
+</div>
+{% else %}
+<div class="card">
+ <p class="muted">You are viewing {{ username }}'s public profile.</p>
+ <p><a href="/login">Log in</a></p>
+</div>
+{% endif %}
 """
 
-UPLOAD_PAGE = STYLE + """
-<div class="card">
+UPLOAD_PAGE = STYLE + TOPBAR + """
+<div class="card" style="max-width:480px;margin:24px auto">
  <h1>Upload avatar</h1>
+ <p class="muted" style="margin-top:4px">Pick a new profile picture for your account.</p>
  {% if error %}<p class="err">Rejected: {{ error }}</p>{% endif %}
  {% if notice %}<p class="ok">{{ notice }}</p>{% endif %}
  <form method="post" action="/upload" enctype="multipart/form-data">
   <input type="file" name="file" accept=".png" required>
   <button>Upload</button>
  </form>
+ <div class="div"></div>
  <p class="muted">Allowed: <code>.png</code> files only. Every upload is forced to
  <code>Content-Type: image/png</code> at upload time.</p>
  <p><a href="/profile">Back to profile</a></p>
