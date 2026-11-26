@@ -46,8 +46,9 @@ nginx/default.conf          target.com vhost: /uploads/ -> MinIO, / -> site
 web/app.py                  TargetSocial: login/upload/profile, upload hardening
 payloads/avatar-payload.png valid 1x1 PNG + appended HTML/script (regenerate with
                             scripts/make-payload.py)
-scripts/run-lab.sh          start everything + run Part A stages
-scripts/01..03-*.sh         Part A: baseline, override, XSS verification
+scripts/run-lab.sh          start everything + run Part A stages (Linux/macOS)
+scripts/run-lab.ps1         start everything + run Part A stages (Windows)
+scripts/01..03-*.sh         Part A: baseline, override, XSS verification (bash)
 ```
 
 ## Installation (Linux / macOS)
@@ -72,20 +73,30 @@ waits for bucket initialization, and then runs the Part A stages for you.
 
 ## Installation (Windows)
 
-Prerequisites: [Docker Desktop](https://www.docker.com/products/docker-desktop/),
-Git, PowerShell as Administrator.
+Prerequisites: [Docker Desktop](https://www.docker.com/products/docker-desktop/)
+(installed **and running** — start it and wait for the whale icon), Git,
+Windows 10/11 (ships with `curl.exe`).
+
+Step by step, in order:
 
 ```powershell
+# 1. get the code (any PowerShell window)
 git clone https://github.com/zet4u/content-type-override-lab.git
 cd content-type-override-lab
 
-# hosts file (elevated PowerShell)
+# 2. hosts file — this ONE command needs an ELEVATED PowerShell
+#    (right-click PowerShell -> Run as Administrator), then come back here
 Add-Content -Path C:\Windows\System32\drivers\etc\hosts -Value "127.0.0.1 target.com"
 
-docker compose up -d --build
+# 3. build + start everything and run the Part A stages
+#    (normal PowerShell window is fine; -ExecutionPolicy just allows the script)
+powershell -ExecutionPolicy Bypass -File .\scripts\run-lab.ps1
 ```
 
-Then follow Part B below manually; the Part A scripts are bash-only.
+If `docker` is not recognized: install Docker Desktop, launch it, and wait
+until it says "Docker Desktop is running" before step 3.
+
+Then do Part B in the browser as described below.
 
 ## Full status check
 
@@ -186,6 +197,8 @@ docker compose up -d --build   # start / rebuild after changes
 docker compose stop            # stop, keep data
 docker compose down -v         # stop and wipe everything
 ```
+
+On Windows use the same commands in PowerShell (`docker compose …`).
 
 ## Safety / scope
 
