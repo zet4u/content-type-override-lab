@@ -44,59 +44,64 @@ STYLE = """
 <style>
  :root { color-scheme: dark; }
  * { box-sizing: border-box; }
- body { margin: 0; background: #18191a; color: #e4e6eb;
-        font-family: Helvetica, Arial, "Segoe UI", Roboto, sans-serif; }
+ body { margin: 0; background: #0e1621; color: rgba(255,255,255,.87);
+        font-family: -apple-system, "Segoe UI", Roboto, Helvetica, sans-serif; }
  .topbar { position: sticky; top: 0; z-index: 10; display: flex; align-items: center;
-           gap: 14px; background: #242526; border-bottom: 1px solid #3a3b3c;
-           padding: 8px 16px; height: 56px; box-shadow: 0 1px 2px rgba(0,0,0,.3); }
- .logo { font-size: 1.6rem; font-weight: 800; letter-spacing: -1px;
-         color: #2d88ff; user-select: none; }
- .logo b { color: #a78bfa; }
- .search { flex: 0 1 260px; background: #3a3b3c; border-radius: 999px;
-           padding: 8px 16px; color: #b0b3b8; font-size: .9rem; }
+           gap: 12px; background: #17212b; border-bottom: 1px solid #101921;
+           padding: 6px 14px; height: 52px; }
+ .mark { width: 34px; height: 34px; border-radius: 50%; flex-shrink: 0;
+         background: linear-gradient(135deg, #3390ec, #64b5ef);
+         display: flex; align-items: center; justify-content: center; }
+ .mark svg { width: 18px; height: 18px; fill: #fff; }
+ .title { display: flex; flex-direction: column; line-height: 1.2; }
+ .title b { font-size: .95rem; font-weight: 700; color: #fff; }
+ .title .muted { font-size: .78rem; margin: 0; }
+ .search { flex: 0 1 300px; background: #242f3d; border-radius: 22px;
+           padding: 8px 16px; color: #7f91a4; font-size: .9rem; }
  .fill { flex: 1; }
- .mechip { display: flex; align-items: center; gap: 8px; background: #3a3b3c;
-           border-radius: 999px; padding: 4px 12px 4px 4px; font-size: .9rem;
+ .mechip { display: flex; align-items: center; gap: 8px; background: #242f3d;
+           border-radius: 22px; padding: 4px 12px 4px 4px; font-size: .9rem;
            font-weight: 600; }
  .initial { width: 28px; height: 28px; border-radius: 50%; color: #fff; font-size: .85rem;
             display: flex; align-items: center; justify-content: center;
-            background: linear-gradient(135deg, #2d88ff, #a78bfa); }
- .wrap { max-width: 640px; margin: 16px auto 48px; padding: 0 10px; }
- .card { background: #242526; border: 1px solid #3a3b3c; border-radius: 8px;
-         padding: 16px; margin-bottom: 12px; box-shadow: 0 1px 2px rgba(0,0,0,.2); }
- h1 { font-size: 1.25rem; margin: 0; }
- h2 { font-size: 1rem; margin: 0 0 12px; color: #b0b3b8; font-weight: 500; }
- code { background: #3a3b3c; padding: 2px 6px; border-radius: 4px;
-        color: #9bc1f9; font-size: .9em; }
- .cover { height: 150px; border-radius: 8px 8px 0 0;
-          background: linear-gradient(120deg, #16243d, #231a42 55%, #101017);
-          margin: -16px -16px 0; }
- .head { display: flex; align-items: flex-end; gap: 14px; margin: -60px 8px 0; }
- img.avatar { width: 128px; height: 128px; object-fit: cover; border-radius: 50%;
-              border: 3px solid #242526; background: #3a3b3c; flex-shrink: 0; }
- .who { padding-bottom: 6px; }
- .who .muted { margin: 2px 0 0; }
+            background: linear-gradient(135deg, #3390ec, #8774e1); }
+ .wrap { max-width: 560px; margin: 20px auto 56px; padding: 0 10px; }
+ .card { background: #17212b; border: 1px solid #101921; border-radius: 12px;
+         padding: 16px; margin-bottom: 12px; }
+ h1 { font-size: 1.2rem; margin: 0; font-weight: 600; }
+ h2 { font-size: .85rem; margin: 0 0 10px; color: #7f91a4; font-weight: 700;
+      text-transform: uppercase; letter-spacing: .5px; }
+ code { background: #242f3d; padding: 3px 8px; border-radius: 6px;
+        color: #64b5ef; font-size: .9em; }
+ .center { text-align: center; }
+ .avatar-big { width: 112px; height: 112px; object-fit: cover; border-radius: 50%;
+               background: #242f3d; margin: 8px auto 10px; display: block;
+               border: 3px solid #242f3d; }
+ .status { color: #3390ec; font-size: .9rem; margin: 4px 0 0; font-weight: 500; }
  input, button { font-size: 15px; padding: 11px 14px; margin: 6px 0;
-                 border-radius: 6px; display: block; width: 100%; }
- input { background: #3a3b3c; border: 1px solid transparent; color: #e4e6eb; }
- input:focus { outline: none; border-color: #2d88ff; }
- button { background: #2d88ff; color: #fff; border: 0; cursor: pointer;
+                 border-radius: 10px; display: block; width: 100%; }
+ input { background: #242f3d; border: 1px solid transparent; color: rgba(255,255,255,.87); }
+ input:focus { outline: none; border-color: #3390ec; }
+ button { background: #3390ec; color: #fff; border: 0; cursor: pointer;
           font-weight: 700; transition: background .15s ease; }
- button:hover { background: #1a6fe8; }
- .err { color: #f0284a; font-weight: 600; }
- .ok { color: #45bd62; font-weight: 600; }
- .muted { color: #b0b3b8; font-size: .95rem; }
- a { color: #4599ff; text-decoration: none; }
+ button:hover { background: #2b81cc; }
+ .err { color: #e8544b; font-weight: 600; }
+ .ok { color: #4fce5d; font-weight: 600; }
+ .muted { color: #7f91a4; font-size: .92rem; }
+ a { color: #62bcf9; text-decoration: none; }
  a:hover { text-decoration: underline; }
- .div { border-top: 1px solid #3a3b3c; margin: 14px -16px; }
- .links { display: flex; gap: 16px; align-items: center; }
+ .div { border-top: 1px solid #101921; margin: 14px 0; }
+ .bubble { background: #182533; border-radius: 12px 12px 12px 4px; padding: 10px 14px;
+           display: inline-block; margin: 0; }
+ .links { display: flex; gap: 16px; align-items: center; flex-wrap: wrap; }
 </style>
 """
 
 TOPBAR = """
 <div class="topbar">
- <span class="logo">target<b>social</b></span>
- <div class="search">Search TargetSocial</div>
+ <span class="mark"><svg viewBox="0 0 24 24"><path d="M2 21l21-9L2 3v7l15 2-15 2z"/></svg></span>
+ <div class="title"><b>TargetSocial</b><span class="muted">content-type override lab</span></div>
+ <div class="search">Search</div>
  <div class="fill"></div>
  {% if username %}<span class="mechip"><span class="initial">{{ username[0]|upper }}</span>{{ username }}</span>{% endif %}
 </div>
@@ -104,8 +109,11 @@ TOPBAR = """
 """
 
 LOGIN_PAGE = STYLE + TOPBAR + """
-<div class="card" style="max-width:400px;margin:64px auto">
- <h1>Log in to TargetSocial</h1>
+<div class="card center" style="max-width:380px;margin:48px auto">
+ <div class="mark" style="width:88px;height:88px;margin:10px auto 16px">
+  <svg viewBox="0 0 24 24" style="width:44px;height:44px"><path d="M2 21l21-9L2 3v7l15 2-15 2z"/></svg>
+ </div>
+ <h1>Sign in to TargetSocial</h1>
  <p class="muted" style="margin-top:4px">A tiny demo social network: users upload avatar images.</p>
  {% if error %}<p class="err">{{ error }}</p>{% endif %}
  <form method="post" action="/login">
@@ -120,20 +128,16 @@ LOGIN_PAGE = STYLE + TOPBAR + """
 """
 
 PROFILE_PAGE = STYLE + TOPBAR + """
-<div class="card">
- <div class="cover"></div>
- <div class="head">
-  <img class="avatar" src="/uploads/{{ avatar }}?v={{ nonce }}" alt="avatar of {{ username }}">
-  <div class="who">
-   <h1>{{ username }}</h1>
-   <p class="muted">{{ username }}'s profile page on TargetSocial</p>
-  </div>
- </div>
+<div class="card center">
+ <img class="avatar-big" src="/uploads/{{ avatar }}?v={{ nonce }}" alt="avatar of {{ username }}">
+ <h1>{{ username }}</h1>
+ <p class="status">online</p>
+ <p class="muted">{{ username }}'s profile page on TargetSocial</p>
 </div>
 {% if is_me %}
 <div class="card">
- <h2>You are logged in — private note (only you should see this)</h2>
- <p><code>{{ note }}</code></p>
+ <h2>Saved messages — only you should see this</h2>
+ <p class="bubble"><code>{{ note }}</code></p>
 </div>
 <div class="card">
  <div class="links">
@@ -145,7 +149,7 @@ PROFILE_PAGE = STYLE + TOPBAR + """
     <code>/uploads/{{ avatar }}</code> from this same origin.</p>
 </div>
 {% else %}
-<div class="card">
+<div class="card center">
  <p class="muted">You are viewing {{ username }}'s public profile.</p>
  <p><a href="/login">Log in</a></p>
 </div>
