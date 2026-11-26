@@ -46,12 +46,19 @@ if (-not (Get-Command python -ErrorAction SilentlyContinue)) {
     Write-Error "python was not found on PATH. Install Python 3.10+ from https://www.python.org/downloads/ (tick 'Add to PATH') and re-run."
 }
 
+$PINNED_MINIO_URL = "https://github.com/minio/minio/releases/download/RELEASE.2024-10-13T13-34-11Z/minio.windows-amd64.RELEASE.2024-10-13T13-34-11Z.exe"
 if (-not ((Test-Path "bin\minio.exe") -and ((Get-Item "bin\minio.exe").Length -gt 10MB))) {
     Write-Host "[*] Downloading the MinIO server binary (first run only)..."
     New-Item -ItemType Directory -Force -Path bin | Out-Null
-    # Pinned release: matches the version the lab was verified against and
-    # mirrors dl.min.io's removed community channel.
-    Get-RemoteFile "https://github.com/minio/minio/releases/download/RELEASE.2024-10-13T13-34-11Z/minio.windows-amd64.RELEASE.2024-10-13T13-34-11Z.exe" "bin\minio.exe"
+    Get-RemoteFile $PINNED_MINIO_URL "bin\minio.exe"
+} else {
+    $versionLine = (& "bin\minio.exe" --version 2>$null | Select-Object -First 1)
+    if ("$versionLine" -notmatch "RELEASE\.2024-10-13T13-34-11Z") {
+        Write-Host "[!] bin\minio.exe is not the verified release: $versionLine"
+        Write-Host "    Newer MinIO builds (2025+/AIStor) removed anonymous bucket policies,"
+        Write-Host "    which this lab depends on. Swapping in the pinned version..."
+        Get-RemoteFile $PINNED_MINIO_URL "bin\minio.exe"
+    }
 }
 
 $hostsPath = "$env:SystemRoot\System32\drivers\etc\hosts"
