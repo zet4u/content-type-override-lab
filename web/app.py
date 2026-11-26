@@ -42,26 +42,50 @@ USERS = {
 
 STYLE = """
 <style>
- body { font-family: -apple-system, "Segoe UI", Roboto, sans-serif; background:#f0f2f5; margin:0; }
- .card { max-width:560px; margin:48px auto; background:#fff; border-radius:12px;
-         padding:28px 32px; box-shadow:0 2px 10px rgba(0,0,0,.12); }
- h1 { margin:0 0 6px; color:#1877f2; }
- code { background:#eee; padding:2px 6px; border-radius:4px; }
- img.avatar { width:128px; height:128px; object-fit:cover; border-radius:50%;
-              border:2px solid #ddd; background:#fafafa; }
- input, button { font-size:1rem; padding:8px 12px; margin:6px 0; border-radius:8px;
-                 border:1px solid #ccc; display:block; width:90%; }
- button { background:#1877f2; color:#fff; border:0; cursor:pointer; width:95%; }
- .err { color:#c00; font-weight:600; }
- .ok { color:#080; font-weight:600; }
- .muted { color:#777; font-size:.9rem; }
+ :root { color-scheme: dark; }
+ * { box-sizing: border-box; }
+ body {
+  font-family: -apple-system, "Segoe UI", Roboto, Inter, sans-serif;
+  background: #0b0e14;
+  background-image:
+   radial-gradient(640px 320px at 12% -8%, rgba(56,132,255,.16), transparent 60%),
+   radial-gradient(520px 280px at 108% 6%, rgba(139,92,246,.13), transparent 60%);
+  background-repeat: no-repeat;
+  min-height: 100vh; margin: 0; color: #e6e9ef;
+ }
+ .card { max-width: 560px; margin: 48px auto; background: rgba(21,26,35,.92);
+         border: 1px solid #232a38; border-radius: 18px;
+         padding: 30px 34px; box-shadow: 0 18px 40px rgba(0,0,0,.45); }
+ h1 { margin: 0 0 8px; font-size: 1.4rem; letter-spacing: .2px;
+      background: linear-gradient(90deg, #4d9fff, #a78bfa);
+      -webkit-background-clip: text; background-clip: text; color: transparent; }
+ code { background: #1b2230; padding: 2px 7px; border-radius: 6px;
+        color: #9ecbff; font-size: .9em; }
+ img.avatar { width: 128px; height: 128px; object-fit: cover; border-radius: 50%;
+              border: 3px solid #263042; box-shadow: 0 0 0 4px rgba(77,159,255,.18);
+              background: #10151d; }
+ input, button { font-size: 1rem; padding: 10px 14px; margin: 8px 0;
+                 border-radius: 10px; display: block; width: 100%; }
+ input { background: #10151d; border: 1px solid #2a3446; color: #e6e9ef; }
+ input:focus { outline: none; border-color: #4d9fff;
+               box-shadow: 0 0 0 3px rgba(77,159,255,.18); }
+ button { background: linear-gradient(90deg, #1877f2, #6d5df6); color: #fff;
+          border: 0; cursor: pointer; font-weight: 600;
+          transition: filter .15s ease, transform .05s ease; }
+ button:hover { filter: brightness(1.12); }
+ button:active { transform: scale(.99); }
+ .err { color: #ff7b72; font-weight: 600; }
+ .ok { color: #4ade80; font-weight: 600; }
+ .muted { color: #8a93a6; font-size: .9rem; }
+ a { color: #6ea8ff; }
+ hr { border: 0; border-top: 1px solid #232a38; margin: 18px 0; }
 </style>
 """
 
 LOGIN_PAGE = STYLE + """
 <div class="card">
- <h1>TargetSocial</h1>
- <p>A tiny demo social network: users upload avatar images.</p>
+ <h1>◈ TargetSocial</h1>
+ <p class="muted" style="margin-top:0">A tiny demo social network: users upload avatar images.</p>
  {% if error %}<p class="err">{{ error }}</p>{% endif %}
  <form method="post" action="/login">
   <input name="username" placeholder="username" value="alice" required>
