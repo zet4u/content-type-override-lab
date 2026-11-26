@@ -46,8 +46,10 @@ nginx/default.conf          target.com vhost: /uploads/ -> MinIO, / -> site
 web/app.py                  TargetSocial: login/upload/profile, upload hardening
 payloads/avatar-payload.png valid 1x1 PNG + appended HTML/script (regenerate with
                             scripts/make-payload.py)
-scripts/run-lab.sh          start everything + run Part A stages (Linux/macOS)
-scripts/run-lab.ps1         start everything + run Part A stages (Windows)
+scripts/run-lab.sh          start everything + run Part A stages (Linux/macOS, Docker)
+scripts/run-lab.ps1         start everything + run Part A stages (Windows, Docker)
+scripts/run-native.ps1      no-Docker mode: MinIO binary + Flask site (Windows)
+scripts/stop-native.ps1     stop the native mode processes
 scripts/01..03-*.sh         Part A: baseline, override, XSS verification (bash)
 ```
 
@@ -104,6 +106,28 @@ Then do Part B in the browser as described below.
 docker compose ps
 curl -s -o /dev/null -w '%{http_code}\n' http://target.com:8080/
 ```
+
+## No Docker? Native mode (Windows)
+
+`scripts/run-native.ps1` does everything without Docker: it downloads
+`minio.exe` + `mc.exe` (standalone Windows binaries), runs MinIO directly,
+creates the public bucket, installs the site deps in a local Python venv and
+starts TargetSocial at `http://target.com:8080` (Flask also serves `/uploads/`
+from the same origin in this mode, replacing nginx).
+
+```powershell
+# one time: Administrator PowerShell, hosts entry
+Add-Content -Path C:\Windows\System32\drivers\etc\hosts -Value "127.0.0.1 target.com"
+
+# every time (normal PowerShell, needs Python 3.10+ on PATH)
+powershell -ExecutionPolicy Bypass -File .\scripts\run-native.ps1
+
+# stop everything
+powershell -ExecutionPolicy Bypass -File .\scripts\stop-native.ps1
+```
+
+URLs are the same as the Docker setup. Reset the stored objects with
+`Remove-Item -Recurse -Force minio-data` after stopping.
 
 ## Part A — direct MinIO (headless)
 

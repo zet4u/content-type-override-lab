@@ -1,9 +1,11 @@
 import io
 import os
+import urllib.error
+import urllib.request
 
 import boto3
 from botocore.client import Config
-from flask import Flask, redirect, render_template_string, request, session, url_for
+from flask import Flask, Response, redirect, render_template_string, request, session, url_for
 
 app = Flask(__name__)
 app.config.update(
@@ -12,9 +14,11 @@ app.config.update(
     MAX_CONTENT_LENGTH=5 * 1024 * 1024,
 )
 
+S3_ENDPOINT = os.environ.get("MINIO_ENDPOINT", "http://minio:9000")
+
 S3 = boto3.client(
     "s3",
-    endpoint_url=os.environ.get("MINIO_ENDPOINT", "http://minio:9000"),
+    endpoint_url=S3_ENDPOINT,
     aws_access_key_id=os.environ.get("MINIO_ROOT_USER", "labadmin"),
     aws_secret_access_key=os.environ.get("MINIO_ROOT_PASSWORD", "labdev-only-change-me"),
     region_name="us-east-1",
@@ -22,6 +26,14 @@ S3 = boto3.client(
 )
 BUCKET = os.environ.get("BUCKET", "public")
 PNG_MAGIC = b"\x89PNG\r\n\x1a\n"
+PASS_THROUGH_HEADERS = (
+    "Content-Type",
+    "Content-Length",
+    "ETag",
+    "Last-Modified",
+    "Accept-Ranges",
+    "Content-Disposition",
+)
 
 USERS = {
     "alice": {"password": "alice-pass-123", "note": "Recovery code: 7721-RDRE-ALICE"},
@@ -193,5 +205,28 @@ def upload():
     )
 
 
+@app.route("/uploads/<path:key>")
+def uploads(key):
+    """Same-origin serving of bucket objects: proxies the request (including
+    its query string, e.g. response-content-type) to the MinIO "public"
+    bucket. In the Docker setup nginx handles this path before Flask; this
+    route exists so the native, no-Docker mode gets the identical layout of
+    the write-up: files rendered on the site's own origin."""
+    target = f"{S3_ENDPOINT}/public/{key}"
+    if request.query_string:
+        target += "?" + request.query_string.decode()
+    req = urllib.request.Request(target, method="GET")
+    try:
+        with urllib.request.urlopen(req, timeout=15) as r:
+            status, headers, body = r.status, dict(r.getheaders()), r.read()
+    except urllib.error.HTTPError as e:
+        status, headers, body = e.code, dict(e.headers), e.read()
+    resp = Response(body, status=status)
+    for header in PASS_THROUGH_HEADERS:
+        if header in headers:
+            resp.headers[header] = headers[header]
+    return resp
+
+
 if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=5000)
+    app.run(host="0.0.0.0", port=int(os.environ.get("PORT", "5000")))
