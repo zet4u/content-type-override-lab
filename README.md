@@ -50,6 +50,8 @@ scripts/run-lab.sh          start everything + run Part A stages (Linux/macOS, D
 scripts/run-lab.ps1         start everything + run Part A stages (Windows, Docker)
 scripts/run-native.ps1      no-Docker mode: MinIO binary + Flask site (Windows)
 scripts/stop-native.ps1     stop the native mode processes
+start.bat                   double-click launcher for the native mode (Windows)
+scripts/setup_minio.py      creates the bucket/policy/demo objects (boto3, no mc.exe)
 scripts/01..03-*.sh         Part A: baseline, override, XSS verification (bash)
 ```
 
@@ -110,10 +112,14 @@ curl -s -o /dev/null -w '%{http_code}\n' http://target.com:8080/
 ## No Docker? Native mode (Windows)
 
 `scripts/run-native.ps1` does everything without Docker: it downloads
-`minio.exe` + `mc.exe` (standalone Windows binaries), runs MinIO directly,
-creates the public bucket, installs the site deps in a local Python venv and
-starts TargetSocial at `http://target.com:8080` (Flask also serves `/uploads/`
-from the same origin in this mode, replacing nginx).
+`minio.exe` (standalone Windows binary, first run only), runs MinIO directly,
+creates the public bucket and demo objects with a small Python (boto3) helper
+(`scripts/setup_minio.py` — no `mc.exe` needed), installs the site deps in a
+local Python venv and starts TargetSocial at `http://target.com:8080` (Flask
+also serves `/uploads/` from the same origin in this mode, replacing nginx).
+
+You can start it from PowerShell as shown below, or simply double-click
+`start.bat`.
 
 ```powershell
 # one time: Administrator PowerShell, hosts entry

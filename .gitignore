@@ -1,3 +1,7 @@
 .env
+bin/
 minio-data/
+.venv/
+.lab-pids.txt
 __pycache__/
+*.pyc

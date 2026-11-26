@@ -1,7 +1,8 @@
 # Native (no-Docker) Windows runner: starts MinIO from its standalone
-# windows-amd64 binary, prepares the public bucket with mc, installs the
-# site's Python dependencies in a local venv and runs TargetSocial
-# same-origin at http://target.com:8080
+# windows-amd64 binary, prepares the public bucket with a small Python
+# (boto3) script - no mc.exe involved - installs the site's Python
+# dependencies in a local venv and runs TargetSocial same-origin at
+# http://target.com:8080
 #
 # Usage:
 #   powershell -ExecutionPolicy Bypass -File .\scripts\run-native.ps1
@@ -45,13 +46,12 @@ if (-not (Get-Command python -ErrorAction SilentlyContinue)) {
     Write-Error "python was not found on PATH. Install Python 3.10+ from https://www.python.org/downloads/ (tick 'Add to PATH') and re-run."
 }
 
-$targets = "bin\minio.exe", "bin\mc.exe"
-$missing = @($targets | Where-Object { -not ((Test-Path $_) -and ((Get-Item $_).Length -gt 10MB)) })
-if ($missing.Count -gt 0) {
-    Write-Host "[*] Downloading MinIO binaries (first run only)..."
+if (-not ((Test-Path "bin\minio.exe") -and ((Get-Item "bin\minio.exe").Length -gt 10MB))) {
+    Write-Host "[*] Downloading the MinIO server binary (first run only)..."
     New-Item -ItemType Directory -Force -Path bin | Out-Null
-    Get-RemoteFile "https://dl.min.io/server/minio/release/windows-amd64/minio.exe" "bin\minio.exe"
-    Get-RemoteFile "https://dl.min.io/client/mc/release/windows-amd64/mc.exe" "bin\mc.exe"
+    # Pinned release: matches the version the lab was verified against and
+    # mirrors dl.min.io's removed community channel.
+    Get-RemoteFile "https://github.com/minio/minio/releases/download/RELEASE.2024-10-13T13-34-11Z/minio.windows-amd64.RELEASE.2024-10-13T13-34-11Z.exe" "bin\minio.exe"
 }
 
 $hostsPath = "$env:SystemRoot\System32\drivers\etc\hosts"
@@ -80,23 +80,22 @@ foreach ($i in 1..60) {
     } catch { Start-Sleep -Seconds 2 }
 }
 
-if (-not $up) { Write-Error "MinIO did not become healthy. Check 'bin\mc.exe admin info local' after 'bin\mc.exe alias set local http://127.0.0.1:9000 labadmin labdev-only-change-me'." }
-
-Write-Host "[*] Preparing public bucket and demo objects..."
-& bin\mc.exe alias set local http://127.0.0.1:9000 labadmin labdev-only-change-me | Out-Null
-& bin\mc.exe mb --ignore-existing local/public | Out-Null
-& bin\mc.exe anonymous set download local/public
-& bin\mc.exe cp --attr "Content-Type=image/png" payloads\avatar-payload.png "local/public/avatar-payload.png"
-& bin\mc.exe cp --attr "Content-Type=text/plain" payloads\secret-notes.txt "local/public/secret-notes.txt"
+if (-not $up) { Write-Error "MinIO did not become healthy. Check the log output and that ports 9000/9001 are free, then re-run this script." }
 
 Write-Host "[*] Preparing the TargetSocial site (venv + deps)..."
 python -m venv .venv
 & .venv\Scripts\python.exe -m pip install --quiet --disable-pip-version-check flask boto3
 
-Write-Host "[*] Starting TargetSocial (same-origin /uploads proxy) on port 8080..."
-$env:PORT = "8080"
+Write-Host "[*] Preparing public bucket and demo objects (via boto3, no mc.exe)..."
 $env:MINIO_ENDPOINT = "http://127.0.0.1:9000"
 $env:BUCKET = "public"
+& .venv\Scripts\python.exe scripts\setup_minio.py
+if ($LASTEXITCODE -ne 0) {
+    Write-Error "Bucket setup failed. Is MinIO still running? Re-run this script."
+}
+
+Write-Host "[*] Starting TargetSocial (same-origin /uploads proxy) on port 8080..."
+$env:PORT = "8080"
 $env:FLASK_SECRET = "lab-secret-change-me"
 $env:SESSION_COOKIE_HTTPONLY = "0"
 $site = Start-Process -FilePath ".venv\Scripts\python.exe" `
